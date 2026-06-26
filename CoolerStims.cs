@@ -21,7 +21,7 @@ namespace CoolerStims
     // SPT requires every mod DLL to contain a class that extends AbstractModMetadata
     public record CoolerStimsMetadata : AbstractModMetadata
     {
-        public override string ModGuid       { get; init; } = "vultify-coolerstims";
+        public override string ModGuid       { get; init; } = "com.vultify.coolerstims";
         public override string Name          { get; init; } = "CoolerStims";
         public override string Author        { get; init; } = "Vultify";
         public override string License       { get; init; } = "MIT";
