@@ -1,0 +1,9 @@
+{
+    "name": "coolerstims",
+    "author": "Vultify",
+    "version": "1.0.0",
+    "license": "MIT",
+    "sptVersion": "~4.0.13",
+    "main": "CoolerStims.dll",
+    "isBundleMod": false
+}
