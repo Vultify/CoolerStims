@@ -29,7 +29,7 @@ namespace CoolerStims
         public override bool?  IsBundleMod   { get; init; } = false;
 
         public override SemanticVersioning.Version Version { get; init; }
-            = new SemanticVersioning.Version("1.0.0", false);
+            = new SemanticVersioning.Version("1.1.0", false);
 
         public override SemanticVersioning.Range SptVersion { get; init; }
             = new SemanticVersioning.Range("~4.0.13", false);
@@ -59,13 +59,10 @@ namespace CoolerStims
         // ── Medical container IDs (contain Propital across all maps) ──────────
         private static readonly HashSet<string> MedContainerIds = new()
         {
-            "5909d5ef86f77467974efbd8",
-            "5d6fe50986f77449d97f7463",
-            "67614e3a6a90e4f10b0b140d",
-            "578f87a3245977356274f2cb",
-            "5909d24f86f77466f56e6855",
-            "5d6d2b5486f774785c2ba8ea",
-            "5d6d2bb386f774785b07a77a",
+            "5909d4c186f7746ad34e805a", // Medcase
+            "5909d24f86f77466f56e6855", // Medbag SMU06
+            "61aa1ead84ea0800645777fd", // Medbag SMU06 (variant)
+            "5d6fe50986f77449d97f7463", // Medical supply crate
         };
 
         // ── Shared ─────────────────────────────────────────────────────────────
@@ -80,7 +77,7 @@ namespace CoolerStims
         private const string APEX_BASE_ID      = "637b612fb7afa97bfc3d7005"; // SJ12 TGLabs
         private const string APEX_ASSORT_ID    = "5c0a1b2c3d4e5f6789abcde2";
         private const double APEX_PRICE        = 56000;
-        private const double APEX_FLEA         = 75000;
+        private const double APEX_FLEA         = 50000;
 
         // ── IRON Endurance Stim ────────────────────────────────────────────────
         private const string IRON_STIM_ID      = "5c0a1b2c3d4e5f6789abcde5";
@@ -129,13 +126,13 @@ namespace CoolerStims
                 CreateIRON();
                 AddIRONBuffs();
 
-                AddToLootTables(APEX_STIM_ID,  400);
-                AddToLootTables(AEGIS_STIM_ID, 300);
-                AddToLootTables(IRON_STIM_ID,  350);
+                AddToLootTables(APEX_STIM_ID,  2000);
+                AddToLootTables(AEGIS_STIM_ID, 1500);
+                AddToLootTables(IRON_STIM_ID,  1700);
 
-                AddToLooseLoot(APEX_STIM_ID,  0.0018);
-                AddToLooseLoot(AEGIS_STIM_ID, 0.0012);
-                AddToLooseLoot(IRON_STIM_ID,  0.0015);
+                AddToLooseLoot(APEX_STIM_ID,  2);
+                AddToLooseLoot(AEGIS_STIM_ID, 1);
+                AddToLooseLoot(IRON_STIM_ID,  2);
 
                 Console.WriteLine("[CoolerStims] Loaded — APEX, AEGIS, and IRON stims added.");
             }
@@ -319,38 +316,33 @@ namespace CoolerStims
 
         private void AddToLootTables(string stimId, int relativeProbability)
         {
-            var locs = _databaseService.GetLocations();
-            var staticLoots = new[]
-            {
-                locs.Bigmap?.StaticLoot?.Value,
-                locs.Woods?.StaticLoot?.Value,
-                locs.Shoreline?.StaticLoot?.Value,
-                locs.Interchange?.StaticLoot?.Value,
-                locs.Lighthouse?.StaticLoot?.Value,
-                locs.TarkovStreets?.StaticLoot?.Value,
-                locs.Laboratory?.StaticLoot?.Value,
-                locs.Factory4Day?.StaticLoot?.Value,
-                locs.Factory4Night?.StaticLoot?.Value,
-                locs.Sandbox?.StaticLoot?.Value,
-            };
+            var locations = _databaseService.GetTables().Locations.GetDictionary();
 
-            foreach (var staticLoot in staticLoots)
+            foreach ((string locationId, Location location) in locations)
             {
-                if (staticLoot == null) continue;
-                foreach (var containerId in MedContainerIds)
+                if (location.StaticLoot == null) continue;
+
+                location.StaticLoot.AddTransformer(staticLoot =>
                 {
-                    MongoId mongoId = containerId;
-                    if (staticLoot.TryGetValue(mongoId, out var container))
+                    if (staticLoot == null) return staticLoot;
+
+                    foreach (var containerId in MedContainerIds)
                     {
-                        var list = container.ItemDistribution?.ToList() ?? new List<ItemDistribution>();
-                        list.Add(new ItemDistribution
+                        MongoId mongoId = containerId;
+                        if (staticLoot.TryGetValue(mongoId, out var container))
                         {
-                            Tpl                 = stimId,
-                            RelativeProbability = relativeProbability
-                        });
-                        container.ItemDistribution = list;
+                            var containerItemDistribution = container.ItemDistribution?.ToList() ?? new List<ItemDistribution>();
+                            containerItemDistribution.Add(new ItemDistribution
+                            {
+                                Tpl                 = stimId,
+                                RelativeProbability = relativeProbability
+                            });
+                            staticLoot[mongoId] = container with { ItemDistribution = containerItemDistribution };
+                        }
                     }
-                }
+
+                    return staticLoot;
+                });
             }
         }
 
@@ -414,71 +406,55 @@ namespace CoolerStims
         }
 
         // ══════════════════════════════════════════════════════════════════════
-        // Loose loot — create a dedicated rare spawnpoint on every map that
-        // already has stim spawns, by cloning the smallest existing stim
-        // spawnpoint and swapping its item template to ours.
+        // Loose loot — inject custom stims into every existing stim spawnpoint
+        // so they share spawn locations with vanilla stims on all maps.
         // ══════════════════════════════════════════════════════════════════════
 
-        private void AddToLooseLoot(string stimId, double spawnProbability)
+        private void AddToLooseLoot(string stimId, int relativeProbability)
         {
-            var locs = _databaseService.GetLocations();
-            var looseLootMaps = new[]
-            {
-                locs.Bigmap?.LooseLoot?.Value,
-                locs.Woods?.LooseLoot?.Value,
-                locs.Shoreline?.LooseLoot?.Value,
-                locs.Interchange?.LooseLoot?.Value,
-                locs.Lighthouse?.LooseLoot?.Value,
-                locs.TarkovStreets?.LooseLoot?.Value,
-                locs.Laboratory?.LooseLoot?.Value,
-                locs.Factory4Day?.LooseLoot?.Value,
-                locs.Factory4Night?.LooseLoot?.Value,
-                locs.Sandbox?.LooseLoot?.Value,
-            };
+            var locations = _databaseService.GetTables().Locations.GetDictionary();
 
-            foreach (var looseLoot in looseLootMaps)
-            {
-                if (looseLoot?.Spawnpoints == null) continue;
+            var composedKey = stimId.GetHashCode().ToString();
 
-                // Find smallest stim spawnpoint to use as clone source
-                Spawnpoint? src = null;
-                int minItems = int.MaxValue;
-                foreach (var sp in looseLoot.Spawnpoints)
+            foreach ((string locationId, Location location) in locations)
+            {
+                if (location.LooseLoot == null) continue;
+
+                location.LooseLoot.AddTransformer(looseLoot =>
                 {
-                    var items = sp.Template?.Items;
-                    if (items == null || !items.Any()) continue;
-                    bool hasStim = items.Any(i => KnownStimTpls.Contains(i.Template.ToString()));
-                    int count = items.Count();
-                    if (hasStim && count < minItems)
+                    if (looseLoot?.Spawnpoints == null) return looseLoot;
+
+                    var spawnpoints = looseLoot.Spawnpoints.ToList();
+
+                    foreach (var sp in spawnpoints)
                     {
-                        minItems = count;
-                        src = sp;
-                        if (minItems == 1) break; // single-item is ideal
+                        var items = sp.Template?.Items;
+                        if (items == null || !items.Any()) continue;
+
+                        bool hasStim = items.Any(i => KnownStimTpls.Contains(i.Template.ToString()));
+                        if (!hasStim) continue;
+
+                        var itemsList = items.ToList();
+                        itemsList.Add(new SptLootItem
+                        {
+                            ComposedKey = composedKey,
+                            Id = new MongoId(),
+                            Template = new MongoId(stimId),
+                            Upd = new Upd { StackObjectsCount = 1 }
+                        });
+                        sp.Template.Items = itemsList;
+
+                        var distList = sp.ItemDistribution?.ToList() ?? new List<LooseLootItemDistribution>();
+                        distList.Add(new LooseLootItemDistribution
+                        {
+                            ComposedKey = new ComposedKey { Key = composedKey },
+                            RelativeProbability = relativeProbability
+                        });
+                        sp.ItemDistribution = distList;
                     }
-                }
-                if (src == null) continue;
 
-                // Deep-clone and strip to root item only
-                var clone = _cloner.Clone(src);
-                var root = clone.Template?.Items?.FirstOrDefault(i => i.Id == clone.Template.Root)
-                           ?? clone.Template?.Items?.FirstOrDefault();
-                if (root == null || clone.Template == null) continue;
-
-                // Swap template, keep everything else (composedKey, _id, position)
-                root.Template = stimId;
-                clone.Template.Items = new List<SptLootItem> { root };
-
-                // Keep only the distribution entry for the root item (first entry)
-                var dist = clone.ItemDistribution?.FirstOrDefault();
-                clone.ItemDistribution = dist != null
-                    ? new List<LooseLootItemDistribution> { dist }
-                    : new List<LooseLootItemDistribution>();
-
-                clone.Probability = spawnProbability;
-
-                var list = looseLoot.Spawnpoints.ToList();
-                list.Add(clone);
-                looseLoot.Spawnpoints = list;
+                    return looseLoot with { Spawnpoints = spawnpoints };
+                });
             }
         }
 
