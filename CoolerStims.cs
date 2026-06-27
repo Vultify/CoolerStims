@@ -29,7 +29,7 @@ namespace CoolerStims
         public override bool?  IsBundleMod   { get; init; } = false;
 
         public override SemanticVersioning.Version Version { get; init; }
-            = new SemanticVersioning.Version("1.1.0", false);
+            = new SemanticVersioning.Version("1.1.1", false);
 
         public override SemanticVersioning.Range SptVersion { get; init; }
             = new SemanticVersioning.Range("~4.0.13", false);
@@ -76,22 +76,22 @@ namespace CoolerStims
         private const string APEX_BUFF_KEY     = "Stimulator_Buffs_APEX";
         private const string APEX_BASE_ID      = "637b612fb7afa97bfc3d7005"; // SJ12 TGLabs
         private const string APEX_ASSORT_ID    = "5c0a1b2c3d4e5f6789abcde2";
-        private const double APEX_PRICE        = 56000;
-        private const double APEX_FLEA         = 50000;
+        private const double APEX_PRICE        = 42000;
+        private const double APEX_FLEA         = 42000;
 
         // ── IRON Endurance Stim ────────────────────────────────────────────────
         private const string IRON_STIM_ID      = "5c0a1b2c3d4e5f6789abcde5";
         private const string IRON_BUFF_KEY     = "Stimulator_Buffs_IRON";
         private const string IRON_BASE_ID      = "5ed51652f6c34d2cc26336a1"; // M.U.L.E.
-        private const double IRON_FLEA         = 150000;
+        private const double IRON_FLEA         = 55000;
 
         // ── AEGIS Medical Stim ─────────────────────────────────────────────────
         private const string AEGIS_STIM_ID      = "5c0a1b2c3d4e5f6789abcde3";
         private const string AEGIS_BUFF_KEY     = "Stimulator_Buffs_AEGIS";
         private const string AEGIS_BASE_ID      = "5c0e534186f7747fa1419867"; // eTG-change
         private const string AEGIS_ASSORT_ID    = "5c0a1b2c3d4e5f6789abcde4";
-        private const double AEGIS_PRICE        = 105000;
-        private const double AEGIS_FLEA         = 125000;
+        private const double AEGIS_PRICE        = 50000;
+        private const double AEGIS_FLEA         = 50000;
 
         // ── Injected services ──────────────────────────────────────────────────
         private readonly CustomItemService      _customItemService;
@@ -221,9 +221,9 @@ namespace CoolerStims
             });
             assort.BarterScheme[APEX_ASSORT_ID] = new List<List<BarterScheme>>
             {
-                new List<BarterScheme> { new BarterScheme { Count = 56000, Template = ROUBLES_ID } }
+                new List<BarterScheme> { new BarterScheme { Count = 42000, Template = ROUBLES_ID } }
             };
-            assort.LoyalLevelItems[APEX_ASSORT_ID] = 2;
+            assort.LoyalLevelItems[APEX_ASSORT_ID] = 4;
         }
 
         // ══════════════════════════════════════════════════════════════════════
@@ -305,7 +305,7 @@ namespace CoolerStims
             });
             assort.BarterScheme[AEGIS_ASSORT_ID] = new List<List<BarterScheme>>
             {
-                new List<BarterScheme> { new BarterScheme { Count = 105000, Template = ROUBLES_ID } }
+                new List<BarterScheme> { new BarterScheme { Count = 50000, Template = ROUBLES_ID } }
             };
             assort.LoyalLevelItems[AEGIS_ASSORT_ID] = 4;
         }
