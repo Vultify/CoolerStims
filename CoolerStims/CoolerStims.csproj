@@ -6,7 +6,7 @@
     <RootNamespace>CoolerStims</RootNamespace>
     <Nullable>enable</Nullable>
     <Optimize>true</Optimize>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
   </PropertyGroup>
 
   <!-- SPT server DLLs — reference-only, do NOT copy to output -->

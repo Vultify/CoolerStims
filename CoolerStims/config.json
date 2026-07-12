@@ -31,5 +31,24 @@
             "healthCrash":      { "value": -1,   "duration": 60,  "delay": 110 },
             "energyCrash":      { "value": -1,   "duration": 60,  "delay": 110 }
         }
+    },
+    "argus": {
+        "traderPrice": 84379,
+        "traderLoyaltyLevel": 4,
+        "buffs": {
+            "attention":       { "value": 20,   "duration": 210, "delay": 0 },
+            "perception":      { "value": 20,   "duration": 210, "delay": 0 },
+            "search":          { "value": 20,   "duration": 210, "delay": 0 },
+            "energyRate":      { "value": 1.5,  "duration": 210, "delay": 0 },
+            "tunnelVision":    { "duration": 60, "delay": 210 },
+            "hydrationCrash":  { "value": -1,   "duration": 60,  "delay": 210 }
+        }
+    },
+    "graft": {
+        "buffs": {
+            "healthRate":      { "value": 1,    "duration": 30, "delay": 0 },
+            "energyCrash":     { "value": -0.5, "duration": 60, "delay": 30 },
+            "handsTremor":     { "value": 2,    "duration": 45, "delay": 30 }
+        }
     }
 }
