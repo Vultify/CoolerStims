@@ -53,7 +53,7 @@ namespace CoolerStims
         public override string Author        { get; init; } = "Vultify";
         public override string License       { get; init; } = "MIT";
         public override string Url           { get; init; } = "";
-        public override bool?  IsBundleMod   { get; init; } = false;
+        public override bool?  IsBundleMod   { get; init; } = true;
 
         public override SemanticVersioning.Version Version { get; init; }
             = new SemanticVersioning.Version("1.3.0", false);
@@ -115,11 +115,12 @@ namespace CoolerStims
         // Salco's Armory's B.O.N.E. stim (same trick) that DrugsItemClass items skip the
         // StimulatorBuffs-forces-Head override that Stimulator-class items hit in
         // GClass3009.method_7, so Drugs-class items can combine StimulatorBuffs with
-        // effects_damage body-part healing. Prefab/UsePrefab below override the visuals
-        // back to Meldonin's syringe so it still looks/plays like an injector, not morphine.
+        // effects_damage body-part healing. Prefab points at CoolerStims' own GRAFT bundle
+        // (custom reskin); UsePrefab stays on Meldonin's syringe so the in-hands use
+        // animation is the stock 2s injector, not morphine.
         private const string GRAFT_BASE_ID   = "544fb3f34bdc2d03748b456a"; // Morphine
         private const string DRUGS_PARENT_ID = "5448f3a14bdc2d27728b4569";
-        private const string GRAFT_LOOT_PREFAB = "assets/content/weapons/usable_items/item_syringe/item_stimulator_mildronate_loot.bundle";
+        private const string GRAFT_LOOT_PREFAB = "coolerstims_graft_loot.bundle";
         private const string GRAFT_USE_PREFAB  = "assets/content/weapons/usable_items/item_syringe/item_stimulator_mildronate_container.bundle";
 
         private readonly CustomItemService  _customItemService;
@@ -247,6 +248,7 @@ namespace CoolerStims
                 {
                     BackgroundColor = "red",
                     StimulatorBuffs = APEX_BUFF_KEY,
+                    Prefab          = new Prefab { Path = "coolerstims_apex_loot.bundle", Rcid = "" },
                     MedUseTime      = 3,
                     MaxHpResource   = 0,
                     EffectsDamage   = new Dictionary<DamageEffectType, EffectsDamageProperties>
@@ -343,6 +345,7 @@ namespace CoolerStims
                 {
                     BackgroundColor = "green",
                     StimulatorBuffs = AEGIS_BUFF_KEY,
+                    Prefab          = new Prefab { Path = "coolerstims_aegis_loot.bundle", Rcid = "" },
                     MedUseTime      = 3,
                     MaxHpResource   = 0,
                     EffectsDamage   = new Dictionary<DamageEffectType, EffectsDamageProperties>
@@ -438,6 +441,7 @@ namespace CoolerStims
                 {
                     BackgroundColor = "blue",
                     StimulatorBuffs = IRON_BUFF_KEY,
+                    Prefab          = new Prefab { Path = "coolerstims_iron_loot.bundle", Rcid = "" },
                     MedUseTime      = 3,
                     MaxHpResource   = 0,
                 }
@@ -500,6 +504,7 @@ namespace CoolerStims
                 {
                     BackgroundColor = "yellow",
                     StimulatorBuffs = ARGUS_BUFF_KEY,
+                    Prefab          = new Prefab { Path = "coolerstims_argus_loot.bundle", Rcid = "" },
                     MedUseTime      = 3,
                     MaxHpResource   = 0,
                 }

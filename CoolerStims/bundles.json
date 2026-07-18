@@ -1,0 +1,9 @@
+{
+  "manifest": [
+    { "key": "coolerstims_apex_loot.bundle",  "dependencyKeys": ["shaders"] },
+    { "key": "coolerstims_aegis_loot.bundle", "dependencyKeys": ["shaders"] },
+    { "key": "coolerstims_iron_loot.bundle",  "dependencyKeys": ["shaders"] },
+    { "key": "coolerstims_argus_loot.bundle", "dependencyKeys": ["shaders"] },
+    { "key": "coolerstims_graft_loot.bundle", "dependencyKeys": ["shaders"] }
+  ]
+}
