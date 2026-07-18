@@ -1,33 +1,29 @@
 # CoolerStims
 
-Five custom combat stimulants for SPT, each with its own niche, tradeoffs, and comedown.
+Five custom stims, each built around a different way to play. These stims add variety to the game where years of the same stims became stale.
 
-## The stims
+Every one has its own model, icon, and injector skin — in the stash, on the ground, and in your hands when you use it.
 
-- **APEX** — combat focus: perception and attention sharpened, with a Quantum Tunnelling rush and a health skill buff
-- **AEGIS** — sustained healing at 9.5 HP/sec
-- **IRON** — damage resistance for holding a push
-- **ARGUS** — looter's perception: search speed, attention, and energy up, tunnel-vision comedown
-- **GRAFT** — multi-dose trauma auto-injector: restores destroyed/fractured limbs (CMS-style) across 5 charges while buffing HealthRate and EnergyRate
+## The lineup
 
-## Where to get them
+**APEX** — the entry fragger. Perception and attention way up, a Quantum Tunnelling rush, and a health skill buff while it lasts.
 
-- Therapist (higher loyalty levels)
-- Flea market
-- Loose loot and medical containers in raid
+**AEGIS** — 9.5 HP/sec of steady healing. Pop it before a push instead of hiding in a bush with a Salewa.
 
-## Configuration
+**IRON** — damage resistance for when you know you're about to get shot and plan to disagree with the outcome.
 
-`config.json` exposes buff values, durations, trader prices, and loyalty levels.
+**ARGUS** — the loot goblin special. Search speed, attention, and energy up, with a tunnel-vision comedown when it wears off.
+
+**GRAFT** — a 5-charge trauma auto-injector that fixes blacked and fractured limbs like a CMS, with HealthRate and EnergyRate buffs on top.
+
+## Getting them
+
+Therapist sells them at higher loyalty levels, they're on the flea, and they spawn as loose loot and in medical containers.
+
+Numbers not to your taste? `config.json` has every buff value, duration, price, and loyalty level.
 
 ## Install
 
-Extract the release zip into your SPT root folder.
+Release zip into your SPT root folder, done. SPT 4.0.x.
 
-## Compatibility
-
-- SPT 4.0.x
-
-## Bugs & feedback
-
-Open an [issue](../../issues) or leave a comment on the mod page. See [CHANGELOG.md](CHANGELOG.md) for version history.
+Issues [here](../../issues), or comment on the mod page. [CHANGELOG.md](CHANGELOG.md) has the history.
