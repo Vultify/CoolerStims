@@ -5,6 +5,7 @@ All notable changes to CoolerStims are documented here. Format follows [Keep a C
 ## [Unreleased]
 ### Added
 - Custom in-game models and icons for all five stims — each stim now has its own look (APEX red/orange with circuit accents, AEGIS white/green with heartbeat motif, IRON gunmetal with heat-tinted cap, ARGUS violet/yellow with radar plate, GRAFT clinical white/red with dose windows) instead of reusing the vanilla donor items' appearance. Ships as asset bundles; stash icons, inspect view, and in-world models all use the new skins
+- New client plugin (`CoolerStimsClient.dll`): the custom skins now also show on the injector in your hands during the use animation. This additionally fixes the stims previously showing random vanilla stim skins (Zagustin, SJ1, ...) when used — the game picks the in-hands skin by item id and doesn't know custom ids, so the plugin overrides it. Toggleable in the F12 menu
 ### Fixed
 - One-second delay before weapons came back up after using APEX, AEGIS, IRON, or ARGUS — use time now matches the 2-second injection animation (GRAFT already did)
 
