@@ -249,7 +249,7 @@ namespace CoolerStims
                     BackgroundColor = "red",
                     StimulatorBuffs = APEX_BUFF_KEY,
                     Prefab          = new Prefab { Path = "coolerstims_apex_loot.bundle", Rcid = "" },
-                    MedUseTime      = 3,
+                    MedUseTime      = 2,
                     MaxHpResource   = 0,
                     EffectsDamage   = new Dictionary<DamageEffectType, EffectsDamageProperties>
                     {
@@ -346,7 +346,7 @@ namespace CoolerStims
                     BackgroundColor = "green",
                     StimulatorBuffs = AEGIS_BUFF_KEY,
                     Prefab          = new Prefab { Path = "coolerstims_aegis_loot.bundle", Rcid = "" },
-                    MedUseTime      = 3,
+                    MedUseTime      = 2,
                     MaxHpResource   = 0,
                     EffectsDamage   = new Dictionary<DamageEffectType, EffectsDamageProperties>
                     {
@@ -442,7 +442,7 @@ namespace CoolerStims
                     BackgroundColor = "blue",
                     StimulatorBuffs = IRON_BUFF_KEY,
                     Prefab          = new Prefab { Path = "coolerstims_iron_loot.bundle", Rcid = "" },
-                    MedUseTime      = 3,
+                    MedUseTime      = 2,
                     MaxHpResource   = 0,
                 }
             });
@@ -505,7 +505,7 @@ namespace CoolerStims
                     BackgroundColor = "yellow",
                     StimulatorBuffs = ARGUS_BUFF_KEY,
                     Prefab          = new Prefab { Path = "coolerstims_argus_loot.bundle", Rcid = "" },
-                    MedUseTime      = 3,
+                    MedUseTime      = 2,
                     MaxHpResource   = 0,
                 }
             });

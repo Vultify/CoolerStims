@@ -5,6 +5,8 @@ All notable changes to CoolerStims are documented here. Format follows [Keep a C
 ## [Unreleased]
 ### Added
 - Custom in-game models and icons for all five stims — each stim now has its own look (APEX red/orange with circuit accents, AEGIS white/green with heartbeat motif, IRON gunmetal with heat-tinted cap, ARGUS violet/yellow with radar plate, GRAFT clinical white/red with dose windows) instead of reusing the vanilla donor items' appearance. Ships as asset bundles; stash icons, inspect view, and in-world models all use the new skins
+### Fixed
+- One-second delay before weapons came back up after using APEX, AEGIS, IRON, or ARGUS — use time now matches the 2-second injection animation (GRAFT already did)
 
 ## [1.3.0] - 2026-07-12
 ### Added
