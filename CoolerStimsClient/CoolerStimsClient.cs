@@ -18,11 +18,8 @@ namespace CoolerStimsClient
             public Texture2D Texture;
         }
 
-        // Custom stim template id -> reskin texture for the in-hands injector.
-        // All injector stims share one in-hands rig; the game assigns the syringe material
-        // at runtime keyed by template id, and unknown (custom) ids get an arbitrary vanilla
-        // stim's material — so we target the syringe renderers by NAME, not by material,
-        // and override whatever material the game picked.
+        // game assigns the syringe material at runtime by template id, custom ids get a
+        // random vanilla skin, so target renderers by name and override whatever it picked
         private static readonly Dictionary<string, Reskin> Reskins = new Dictionary<string, Reskin>
         {
             { "5c0a1b2c3d4e5f6789abcde1", new Reskin { TextureFile = "item_stimulator_apex_d.png"  } }, // APEX
@@ -32,7 +29,7 @@ namespace CoolerStimsClient
             { "5c0a1b2c3d4e5f6789abcde8", new Reskin { TextureFile = "item_stimulator_graft_d.png" } }, // GRAFT
         };
 
-        // The shared injector rig's renderer names (same for every stim's container prefab).
+        // shared injector rig, same names in every stim's container prefab
         private static readonly HashSet<string> SyringeRendererNames = new HashSet<string>
         {
             "syringe_LOD0",
@@ -40,8 +37,7 @@ namespace CoolerStimsClient
             "syringe_cap_LOD0",
         };
 
-        // The rig is pooled and reused across stims; remember each material instance's
-        // game-assigned texture so a later vanilla use can be restored if needed.
+        // rig is pooled across stims, remember originals so vanilla uses can be restored
         private readonly Dictionary<int, Texture> _originalTextures = new Dictionary<int, Texture>();
         private readonly HashSet<Texture> _ownTextures = new HashSet<Texture>();
 
@@ -52,7 +48,7 @@ namespace CoolerStimsClient
         private bool _loggedThisDraw;
         private int _attempts;
 
-        // If the rig's renderers never even appear, stop scanning after ~5 s.
+        // stop scanning after ~5s if renderers never appear
         private const int MaxAttempts = 300;
 
         private void Awake()
@@ -121,9 +117,7 @@ namespace CoolerStimsClient
                     }
                 }
 
-                // Re-assert every frame while the item is in hands: the game assigns the
-                // syringe material itself at some point during the draw, and this way we
-                // win no matter when that happens.
+                // re-assert every frame, the game assigns its material at an unknown point in the draw
                 if (_active && controller != null)
                 {
                     if (ApplyTick(controller))
@@ -176,8 +170,7 @@ namespace CoolerStimsClient
 
                 if (reskin != null && reskin.Texture != null)
                 {
-                    // .materials (never .sharedMaterials): the assigned material asset is
-                    // shared with the vanilla stims' world/loot models.
+                    // .materials never .sharedMaterials, the shared asset also renders vanilla world models
                     foreach (var material in renderer.materials)
                     {
                         if (material == null)
@@ -199,8 +192,7 @@ namespace CoolerStimsClient
                 }
                 else if (reskin == null)
                 {
-                    // Vanilla stim on a pooled rig we may have touched earlier: if one of our
-                    // textures is still on it, put the game's own texture back.
+                    // pooled rig may still carry our texture, put the game's back
                     foreach (var material in renderer.materials)
                     {
                         if (material == null || !_ownTextures.Contains(material.GetTexture("_MainTex")))

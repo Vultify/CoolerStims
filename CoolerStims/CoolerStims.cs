@@ -111,13 +111,7 @@ namespace CoolerStims
 
         private const string GRAFT_STIM_ID   = "5c0a1b2c3d4e5f6789abcde8";
         private const string GRAFT_BUFF_KEY  = "Stimulator_Buffs_GRAFT";
-        // Cloned from Morphine (Drugs baseclass), not a real Stimulant — confirmed via
-        // Salco's Armory's B.O.N.E. stim (same trick) that DrugsItemClass items skip the
-        // StimulatorBuffs-forces-Head override that Stimulator-class items hit in
-        // GClass3009.method_7, so Drugs-class items can combine StimulatorBuffs with
-        // effects_damage body-part healing. Prefab points at CoolerStims' own GRAFT bundle
-        // (custom reskin); UsePrefab stays on Meldonin's syringe so the in-hands use
-        // animation is the stock 2s injector, not morphine.
+        // Morphine clone on purpose, Drugs-class skips the buffs-force-Head override so buffs + limb healing coexist
         private const string GRAFT_BASE_ID   = "544fb3f34bdc2d03748b456a"; // Morphine
         private const string DRUGS_PARENT_ID = "5448f3a14bdc2d27728b4569";
         private const string GRAFT_LOOT_PREFAB = "coolerstims_graft_loot.bundle";
@@ -597,30 +591,17 @@ namespace CoolerStims
                 OverrideProperties = new TemplateItemProperties
                 {
                     BackgroundColor  = "violet",
-                    // MedUseTime must match the actual baked length of the use animation in
-                    // whatever bundle Prefab/UsePrefab point to (Meldonin's syringe, both 2s
-                    // vanilla) — not an arbitrary flavor number. Mismatching this (previously 4)
-                    // against the real 2s clip is the likely cause of the weapon not returning
-                    // to hands after use.
+                    // must match the bundle's real 2s clip, 4 broke hands return after use
                     MedUseTime       = 2,
                     MaxHpResource    = 5,
                     StimulatorBuffs  = GRAFT_BUFF_KEY,
-                    // Deliberately NOT overriding BodyPartPriority — left empty like Morphine's
-                    // own default (Salco's BONE stim does the same). A non-empty custom priority
-                    // list here caused the engine's auto-continue-on-double-click behavior (meant
-                    // for cycling through multiple destroyed limbs) to keep reapplying to the same
-                    // already-healed limb every second until charges ran out, since this item is
-                    // Drugs-class and can't signal "nothing left to treat" the way Medkit-class
-                    // items do. Leaving it empty (confirmed via BONE, which doesn't drain like
-                    // this and returns hands immediately after the animation) avoids that loop.
+                    // no BodyPartPriority override, a custom list made double-click drain every charge into one limb
                     EffectsDamage    = new Dictionary<DamageEffectType, EffectsDamageProperties>
                     {
                         [DamageEffectType.Fracture]      = new EffectsDamageProperties { Delay = 0, Duration = 0, FadeOut = 0 },
                         [DamageEffectType.DestroyedPart] = new EffectsDamageProperties { Delay = 0, Duration = 0, FadeOut = 0, HealthPenaltyMin = 25, HealthPenaltyMax = 45 },
                     },
-                    // Visuals only — keeps GRAFT looking/playing like the injector it's
-                    // supposed to be instead of Morphine's syringe, even though it's
-                    // structurally cloned from Morphine for the Drugs-class mechanics above.
+                    // visuals only, mechanically still the Morphine clone
                     Prefab    = new Prefab { Path = GRAFT_LOOT_PREFAB, Rcid = "" },
                     UsePrefab = new Prefab { Path = GRAFT_USE_PREFAB,  Rcid = "" },
                 }
