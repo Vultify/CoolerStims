@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CoolerStimsClient
 {
-    [BepInPlugin("com.vultify.coolerstims", "CoolerStims", "1.4.0")]
+    [BepInPlugin("com.vultify.coolerstims", "CoolerStims", "2.0.0")]
     public class CoolerStimsClientPlugin : BaseUnityPlugin
     {
         private class Reskin
@@ -209,4 +209,5 @@ namespace CoolerStimsClient
             return found;
         }
     }
+
 }

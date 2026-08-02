@@ -5,20 +5,21 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Threading;
 using SemanticVersioning;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Traders;
 using SPTarkov.Server.Core.Utils.Cloners;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Spt.Mod;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Enums;
 using System.Linq;
-using SPTarkov.Server.Core.Services.Mod;
-using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Services.Modding.Custom;
 
 namespace CoolerStims
 {
@@ -46,27 +47,33 @@ namespace CoolerStims
         [JsonPropertyName("graft")] public StimConfig Graft { get; set; } = new();
     }
 
-    public record CoolerStimsMetadata : AbstractModMetadata
+    // 4.1 dropped IsBundleMod - the server looks for bundles.json in the mod folder instead
+    public record CoolerStimsMetadata : IModMetadata
     {
-        public override string ModGuid       { get; init; } = "com.vultify.coolerstims";
-        public override string Name          { get; init; } = "CoolerStims";
-        public override string Author        { get; init; } = "Vultify";
-        public override string License       { get; init; } = "MIT";
-        public override string Url           { get; init; } = "";
-        public override bool?  IsBundleMod   { get; init; } = true;
+        public string ModGuid { get; init; } = "com.vultify.coolerstims";
+        public string Name    { get; init; } = "CoolerStims";
+        public string Author  { get; init; } = "Vultify";
+        public string License { get; init; } = "MIT";
+        public string? Url    { get; init; } = "";
 
-        public override SemanticVersioning.Version Version { get; init; }
-            = new SemanticVersioning.Version("1.4.0", false);
+        public bool HasPrepatcher { get; init; } = false;
 
-        public override SemanticVersioning.Range SptVersion { get; init; }
-            = new SemanticVersioning.Range("~4.0.13", false);
+        public SemanticVersioning.Version Version { get; init; }
+            = new SemanticVersioning.Version("2.0.0", false);
 
-        public override List<string>                                  Contributors      { get; init; } = new();
-        public override List<string>                                  Incompatibilities { get; init; } = new();
-        public override Dictionary<string, SemanticVersioning.Range>  ModDependencies   { get; init; } = new();
+        public SemanticVersioning.Range SptVersion { get; init; }
+            = new SemanticVersioning.Range("~4.1.1", false);
+
+        public List<string>?                                  Contributors      { get; init; } = new();
+        public List<string>?                                  Incompatibilities { get; init; } = new();
+        public Dictionary<string, SemanticVersioning.Range>?  ModDependencies   { get; init; } = new();
     }
 
-    [Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 3)]
+    // NOT PostLoad, despite what the 4.1 migration guide suggests for old PostDBModLoader mods:
+    // profiles are loaded and validated at SaveCallbacks (600000), and any profile holding one of
+    // our stims is thrown out as "modded item not in items db" if we register after that. Handbook
+    // is built at 500000 too, so we have to be in front of both.
+    [Injectable(TypePriority = OnLoadOrder.TraderRegistration + 3)]
     public class CoolerStimsMod : IOnLoad
     {
         private static readonly HashSet<string> KnownStimTpls = new()
@@ -118,28 +125,32 @@ namespace CoolerStims
         private const string GRAFT_USE_PREFAB  = "assets/content/weapons/usable_items/item_syringe/item_stimulator_mildronate_container.bundle";
 
         private readonly CustomItemService  _customItemService;
-        private readonly DatabaseService    _databaseService;
+        private readonly GlobalTable        _globalTable;
+        private readonly LocationTable      _locationTable;
         private readonly TraderHelper       _traderHelper;
         private readonly ICloner            _cloner;
         private readonly ISptLogger<CoolerStimsMod> _logger;
 
         private ModConfig _config = new();
 
+        // 4.1 removed DatabaseService and GetTables() - every table is its own DI singleton
         public CoolerStimsMod(
             CustomItemService  customItemService,
-            DatabaseService    databaseService,
+            GlobalTable        globalTable,
+            LocationTable      locationTable,
             TraderHelper       traderHelper,
             ICloner            cloner,
             ISptLogger<CoolerStimsMod> logger)
         {
             _customItemService = customItemService;
-            _databaseService   = databaseService;
+            _globalTable       = globalTable;
+            _locationTable     = locationTable;
             _traderHelper      = traderHelper;
             _cloner            = cloner;
             _logger            = logger;
         }
 
-        public Task OnLoad()
+        public Task OnLoadAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -218,6 +229,7 @@ namespace CoolerStims
             {
                 ItemTplToClone       = APEX_BASE_ID,
                 NewId                = APEX_STIM_ID,
+                NewItemName          = "APEX",
                 ParentId             = PARENT_ID,
                 HandbookParentId     = HANDBOOK_PARENT,
                 HandbookPriceRoubles = 42000,
@@ -264,7 +276,7 @@ namespace CoolerStims
             var tunnel    = GetBuff(c, "tunnelVision",      0,    60,  95);
             var health    = GetBuff(c, "healthSkill",       20,   110, 0);
 
-            var buffs = _databaseService.GetGlobals().Configuration.Health.Effects.Stimulator.Buffs;
+            var buffs = _globalTable.Configuration.Health.Effects.Stimulator.Buffs;
             buffs[APEX_BUFF_KEY] = new List<Buff>
             {
                 new Buff { BuffType = "MaxStamina",        Chance = 1, Delay = maxStam.Delay,  Duration = maxStam.Duration,  Value = maxStam.Value,  AbsoluteValue = true,  SkillName = "" },
@@ -314,6 +326,7 @@ namespace CoolerStims
             {
                 ItemTplToClone       = AEGIS_BASE_ID,
                 NewId                = AEGIS_STIM_ID,
+                NewItemName          = "AEGIS",
                 ParentId             = PARENT_ID,
                 HandbookParentId     = HANDBOOK_PARENT,
                 HandbookPriceRoubles = 50000,
@@ -359,7 +372,7 @@ namespace CoolerStims
             var stam    = GetBuff(c, "staminaCrash",     -2,   60,  70);
             var tunnel  = GetBuff(c, "tunnelVision",     0,    60,  70);
 
-            var buffs = _databaseService.GetGlobals().Configuration.Health.Effects.Stimulator.Buffs;
+            var buffs = _globalTable.Configuration.Health.Effects.Stimulator.Buffs;
             buffs[AEGIS_BUFF_KEY] = new List<Buff>
             {
                 new Buff { BuffType = "RemoveAllBloodLosses", Chance = 1, Delay = bleed.Delay,  Duration = bleed.Duration,  Value = 0,            AbsoluteValue = true,  SkillName = "" },
@@ -407,6 +420,7 @@ namespace CoolerStims
             {
                 ItemTplToClone       = IRON_BASE_ID,
                 NewId                = IRON_STIM_ID,
+                NewItemName          = "IRON",
                 ParentId             = PARENT_ID,
                 HandbookParentId     = HANDBOOK_PARENT,
                 HandbookPriceRoubles = 55000,
@@ -451,7 +465,7 @@ namespace CoolerStims
             var hCrash  = GetBuff(c, "healthCrash",  -1,   60,  110);
             var eCrash  = GetBuff(c, "energyCrash",  -1,   60,  110);
 
-            var buffs = _databaseService.GetGlobals().Configuration.Health.Effects.Stimulator.Buffs;
+            var buffs = _globalTable.Configuration.Health.Effects.Stimulator.Buffs;
             buffs[IRON_BUFF_KEY] = new List<Buff>
             {
                 new Buff { BuffType = "WeightLimit",  Chance = 1, Delay = weight.Delay,  Duration = weight.Duration,  Value = weight.Value,  AbsoluteValue = false, SkillName = "" },
@@ -472,6 +486,7 @@ namespace CoolerStims
             {
                 ItemTplToClone       = ARGUS_BASE_ID,
                 NewId                = ARGUS_STIM_ID,
+                NewItemName          = "ARGUS",
                 ParentId             = PARENT_ID,
                 HandbookParentId     = HANDBOOK_PARENT,
                 HandbookPriceRoubles = 42000,
@@ -515,7 +530,7 @@ namespace CoolerStims
             var tunnel     = GetBuff(c, "tunnelVision",   0,    60,  210);
             var hydra      = GetBuff(c, "hydrationCrash", -1,   60,  210);
 
-            var buffs = _databaseService.GetGlobals().Configuration.Health.Effects.Stimulator.Buffs;
+            var buffs = _globalTable.Configuration.Health.Effects.Stimulator.Buffs;
             buffs[ARGUS_BUFF_KEY] = new List<Buff>
             {
                 new Buff { BuffType = "SkillRate",         Chance = 1, Delay = attention.Delay,  Duration = attention.Duration,  Value = attention.Value,  AbsoluteValue = true, SkillName = "Attention" },
@@ -564,6 +579,7 @@ namespace CoolerStims
             {
                 ItemTplToClone       = GRAFT_BASE_ID,
                 NewId                = GRAFT_STIM_ID,
+                NewItemName          = "GRAFT",
                 ParentId             = DRUGS_PARENT_ID,
                 HandbookParentId     = HANDBOOK_PARENT,
                 HandbookPriceRoubles = 22000,
@@ -615,7 +631,7 @@ namespace CoolerStims
             var energy = GetBuff(c, "energyCrash", -0.5, 60, 30);
             var tremor = GetBuff(c, "handsTremor",  2,    45, 30);
 
-            var buffs = _databaseService.GetGlobals().Configuration.Health.Effects.Stimulator.Buffs;
+            var buffs = _globalTable.Configuration.Health.Effects.Stimulator.Buffs;
             buffs[GRAFT_BUFF_KEY] = new List<Buff>
             {
                 new Buff { BuffType = "HealthRate",  Chance = 1, Delay = heal.Delay,   Duration = heal.Duration,   Value = heal.Value,   AbsoluteValue = true, SkillName = "" },
@@ -630,7 +646,7 @@ namespace CoolerStims
 
         private void AddToLootTables(string stimId, int relativeProbability)
         {
-            var locations = _databaseService.GetTables().Locations.GetDictionary();
+            var locations = _locationTable.GetDictionary();
 
             foreach ((string locationId, Location location) in locations)
             {
@@ -666,7 +682,7 @@ namespace CoolerStims
 
         private void AddToLooseLoot(string stimId, int relativeProbability)
         {
-            var locations = _databaseService.GetTables().Locations.GetDictionary();
+            var locations = _locationTable.GetDictionary();
             var composedKey = stimId.GetHashCode().ToString();
 
             foreach ((string locationId, Location location) in locations)

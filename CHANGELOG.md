@@ -4,6 +4,15 @@ All notable changes to CoolerStims are documented here. Format follows [Keep a C
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-02
+### Changed
+- Now targets SPT 4.1 — requires **SPT 4.1.1 or newer** and will not load on 4.0.x. 4.1.0 is excluded on purpose: it shipped a client bug that stopped mod bundles loading, so the stims showed a placeholder model there. Fixed by SPT in 4.1.1.
+- Server mod rebuilt for .NET 10 and the 4.1 mod API (interface-based metadata, async load, injected database tables)
+- Server half now installs to `SPT_Runtime/user/mods/CoolerStims/` — the server path moved in 4.1
+- Dropped the unused `package.json`, a leftover from the TypeScript-era server
+### Fixed
+- Profiles holding CoolerStims items being rejected at startup as "modded item not in items db". The stims are now registered before the server validates profiles.
+
 ## [1.4.0] - 2026-07-18
 ### Added
 - Custom in-game models and icons for all five stims — each stim now has its own look (APEX red/orange with circuit accents, AEGIS white/green with heartbeat motif, IRON gunmetal with heat-tinted cap, ARGUS violet/yellow with radar plate, GRAFT clinical white/red with dose windows) instead of reusing the vanilla donor items' appearance. Ships as asset bundles; stash icons, inspect view, and in-world models all use the new skins

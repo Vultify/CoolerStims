@@ -1,2 +1,6 @@
 build.bat
 reskin/
+
+# banner / profile art, not part of the mod
+/*.jpg
+/*.png
