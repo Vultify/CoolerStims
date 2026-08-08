@@ -243,8 +243,9 @@ namespace CoolerStims
                         Description =
                             "Adrenal Performance Enhancement eXtract. A military-grade combat stimulant " +
                             "developed for tier-1 special operations units. APEX boosts neuromuscular " +
-                            "response, increases stamina capacity, and reduces stress-induced weapon " +
-                            "deviation, improving performance under sustained fire.\n\n" +
+                            "response, increases stamina capacity, reduces stress-induced weapon " +
+                            "deviation, and thickens the blood against penetrating trauma, improving " +
+                            "performance under sustained fire.\n\n" +
                             "Active period: approximately 110 seconds.\n" +
                             "Side effects: moderate energy depletion following the active phase.\n\n" +
                             "Classified Schedule II in most jurisdictions. For authorised use only."
@@ -275,6 +276,7 @@ namespace CoolerStims
             var eCrash    = GetBuff(c, "energyCrash",       -3,   60,  95);
             var tunnel    = GetBuff(c, "tunnelVision",      0,    60,  95);
             var health    = GetBuff(c, "healthSkill",       20,   110, 0);
+            var vitality  = GetBuff(c, "vitality",          10,   110, 0);
 
             var buffs = _globalTable.Configuration.Health.Effects.Stimulator.Buffs;
             buffs[APEX_BUFF_KEY] = new List<Buff>
@@ -286,6 +288,7 @@ namespace CoolerStims
                 new Buff { BuffType = "EnergyRate",         Chance = 1, Delay = eCrash.Delay,   Duration = eCrash.Duration,   Value = eCrash.Value,   AbsoluteValue = true,  SkillName = "" },
                 new Buff { BuffType = "QuantumTunnelling",  Chance = 1, Delay = tunnel.Delay,   Duration = tunnel.Duration,   Value = 0,              AbsoluteValue = true,  SkillName = "" },
                 new Buff { BuffType = "SkillRate",          Chance = 1, Delay = health.Delay,   Duration = health.Duration,   Value = health.Value,   AbsoluteValue = true,  SkillName = "Health" },
+                new Buff { BuffType = "SkillRate",          Chance = 1, Delay = vitality.Delay, Duration = vitality.Duration, Value = vitality.Value, AbsoluteValue = true,  SkillName = "Vitality" },
             };
         }
 

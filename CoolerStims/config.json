@@ -9,7 +9,8 @@
             "energyRate":       { "value": 1.5,  "duration": 110, "delay": 0 },
             "energyCrash":      { "value": -3,   "duration": 60,  "delay": 95 },
             "tunnelVision":     { "duration": 60, "delay": 95 },
-            "healthSkill":      { "value": 20,   "duration": 110, "delay": 0 }
+            "healthSkill":      { "value": 20,   "duration": 110, "delay": 0 },
+            "vitality":         { "value": 10,   "duration": 110, "delay": 0 }
         }
     },
     "aegis": {
