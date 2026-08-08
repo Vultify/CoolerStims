@@ -3,6 +3,8 @@
 All notable changes to CoolerStims are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
 ## [Unreleased]
+
+## [2.0.1] - 2026-08-07
 ### Added
 - APEX now raises the Vitality skill for its 110 second window, on top of everything it already did. Less chance of bleeding out when you get hit mid-push. Tunable in `config.json` like the rest of the buffs
 
