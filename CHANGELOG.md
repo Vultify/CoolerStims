@@ -6,6 +6,9 @@ All notable changes to CoolerStims are documented here. Format follows [Keep a C
 ### Added
 - APEX now raises the Vitality skill for its 110 second window, on top of everything it already did. Less chance of bleeding out when you get hit mid-push. Tunable in `config.json` like the rest of the buffs
 
+### Fixed
+- GRAFT can now go in the Injector case. The case only takes stimulants plus Morphine specifically, and GRAFT is a Morphine clone filed under Drugs (that is what lets its buffs and limb healing work at the same time), so it matched neither
+
 ## [2.0.0] - 2026-08-02
 ### Changed
 - Now targets SPT 4.1 — requires **SPT 4.1.1 or newer** and will not load on 4.0.x. 4.1.0 is excluded on purpose: it shipped a client bug that stopped mod bundles loading, so the stims showed a placeholder model there. Fixed by SPT in 4.1.1.

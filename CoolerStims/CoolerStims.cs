@@ -123,10 +123,12 @@ namespace CoolerStims
         private const string DRUGS_PARENT_ID = "5448f3a14bdc2d27728b4569";
         private const string GRAFT_LOOT_PREFAB = "coolerstims_graft_loot.bundle";
         private const string GRAFT_USE_PREFAB  = "assets/content/weapons/usable_items/item_syringe/item_stimulator_mildronate_container.bundle";
+        private const string INJECTOR_CASE_ID  = "619cbf7d23893217ec30b689";
 
         private readonly CustomItemService  _customItemService;
         private readonly GlobalTable        _globalTable;
         private readonly LocationTable      _locationTable;
+        private readonly TemplateTable      _templateTable;
         private readonly TraderHelper       _traderHelper;
         private readonly ICloner            _cloner;
         private readonly ISptLogger<CoolerStimsMod> _logger;
@@ -138,6 +140,7 @@ namespace CoolerStims
             CustomItemService  customItemService,
             GlobalTable        globalTable,
             LocationTable      locationTable,
+            TemplateTable      templateTable,
             TraderHelper       traderHelper,
             ICloner            cloner,
             ISptLogger<CoolerStimsMod> logger)
@@ -145,6 +148,7 @@ namespace CoolerStims
             _customItemService = customItemService;
             _globalTable       = globalTable;
             _locationTable     = locationTable;
+            _templateTable     = templateTable;
             _traderHelper      = traderHelper;
             _cloner            = cloner;
             _logger            = logger;
@@ -173,6 +177,7 @@ namespace CoolerStims
 
                 CreateGRAFT();
                 AddGRAFTBuffs();
+                AllowGRAFTInInjectorCase();
 
                 AddToLootTables(APEX_STIM_ID,  2000);
                 AddToLootTables(AEGIS_STIM_ID, 1500);
@@ -641,6 +646,35 @@ namespace CoolerStims
                 new Buff { BuffType = "EnergyRate",  Chance = 1, Delay = energy.Delay, Duration = energy.Duration, Value = energy.Value, AbsoluteValue = true, SkillName = "" },
                 new Buff { BuffType = "HandsTremor", Chance = 1, Delay = tremor.Delay, Duration = tremor.Duration, Value = tremor.Value, AbsoluteValue = true, SkillName = "" },
             };
+        }
+
+        // The case whitelists the Stimulator class plus morphine by tpl. GRAFT is neither: it
+        // clones morphine but parents under Drugs so buffs and limb healing can coexist, so it
+        // needs the same by-tpl exception BSG gave morphine.
+        private void AllowGRAFTInInjectorCase()
+        {
+            if (!_templateTable.Items.TryGetValue(new MongoId(INJECTOR_CASE_ID), out var injectorCase))
+            {
+                _logger.Warning("[CoolerStims] Injector case not found, GRAFT will not fit inside it.");
+                return;
+            }
+
+            var filter = injectorCase.Properties?.Grids?.FirstOrDefault()
+                                     ?.Properties?.Filters?.FirstOrDefault();
+            if (filter?.Filter == null)
+            {
+                _logger.Warning("[CoolerStims] Injector case grid filter missing, GRAFT will not fit inside it.");
+                return;
+            }
+
+            filter.Filter.Add(new MongoId(GRAFT_STIM_ID));
+
+            // read back off the table, not the local reference, so a copied enumerable can't pass
+            var check = _templateTable.Items[new MongoId(INJECTOR_CASE_ID)]
+                                      .Properties?.Grids?.FirstOrDefault()
+                                      ?.Properties?.Filters?.FirstOrDefault()?.Filter;
+            if (check == null || !check.Contains(new MongoId(GRAFT_STIM_ID)))
+                _logger.Warning("[CoolerStims] Injector case filter did not take the GRAFT entry.");
         }
 
         // ══════════════════════════════════════════════════════════════════════
