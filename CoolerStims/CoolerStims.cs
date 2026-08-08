@@ -62,7 +62,7 @@ namespace CoolerStims
             = new SemanticVersioning.Version("2.0.0", false);
 
         public SemanticVersioning.Range SptVersion { get; init; }
-            = new SemanticVersioning.Range("~4.1.1", false);
+            = new SemanticVersioning.Range("~4.1.2", false);
 
         public List<string>?                                  Contributors      { get; init; } = new();
         public List<string>?                                  Incompatibilities { get; init; } = new();
