@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>CoolerStims</AssemblyName>
+    <Authors>Vultify</Authors>
     <RootNamespace>CoolerStims</RootNamespace>
     <Nullable>enable</Nullable>
     <Optimize>true</Optimize>

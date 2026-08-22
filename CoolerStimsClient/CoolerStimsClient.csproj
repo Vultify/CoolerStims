@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>CoolerStimsClient</AssemblyName>
+    <Authors>Vultify</Authors>
     <RootNamespace>CoolerStimsClient</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Version>2.0.1</Version>
