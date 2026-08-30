@@ -61,8 +61,9 @@ namespace CoolerStims
         public SemanticVersioning.Version Version { get; init; }
             = new SemanticVersioning.Version("2.0.1", false);
 
+        // floor is 4.1.1, not the patch we tested on - 4.1.0 is out because its bundle loading was broken
         public SemanticVersioning.Range SptVersion { get; init; }
-            = new SemanticVersioning.Range("~4.1.2", false);
+            = new SemanticVersioning.Range("~4.1.1", false);
 
         public List<string>?                                  Contributors      { get; init; } = new();
         public List<string>?                                  Incompatibilities { get; init; } = new();
