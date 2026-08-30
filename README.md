@@ -24,6 +24,6 @@ Numbers not to your taste? `config.json` has every buff value, duration, price, 
 
 ## Install
 
-Release zip into your SPT root folder, done. SPT 4.1.2 or newer, it won't load on anything older.
+Release zip into your SPT root folder, done. SPT 4.1.1 or newer, it won't load on anything older.
 
 Issues [here](../../issues), or comment on the mod page. [CHANGELOG.md](CHANGELOG.md) has the history.

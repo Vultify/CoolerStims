@@ -59,7 +59,7 @@ namespace CoolerStims
         public bool HasPrepatcher { get; init; } = false;
 
         public SemanticVersioning.Version Version { get; init; }
-            = new SemanticVersioning.Version("2.0.1", false);
+            = new SemanticVersioning.Version("2.0.2", false);
 
         // floor is 4.1.1, not the patch we tested on - 4.1.0 is out because its bundle loading was broken
         public SemanticVersioning.Range SptVersion { get; init; }

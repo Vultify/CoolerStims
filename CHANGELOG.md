@@ -3,6 +3,8 @@
 All notable changes to CoolerStims are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
 ## [Unreleased]
+
+## [2.0.2] - 2026-08-30
 ### Changed
 - Runs on **SPT 4.1.1 or newer** again. The 4.1.2 floor 2.0.1 shipped with was never a real requirement - nothing in that update needs 4.1.2, the number just followed the install it was tested on
 
